@@ -1,4 +1,3 @@
-
 # News From The Northcoders API
 
 Welcome to the Northcoders News API! This project serves as the backend API for Northcoders News, providing  the following endpoints: 
