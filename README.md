@@ -1,4 +1,7 @@
 ## News From The Northcoders API
+For instructions, please head over to [L2C NC News](https://l2c.northcoders.com/courses/be/nc-news).
+# nc-news-1
+
 
 Welcome to the Northcoders News API! This project serves as the backend API for Northcoders News, providing  the following endpoints: 
 
@@ -63,3 +66,4 @@ To run this project locally, follow these steps:
 
 
    
+
