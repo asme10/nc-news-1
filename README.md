@@ -1,21 +1,6 @@
 # News From The Northcoders API
 
-Welcome to the Northcoders News API! This project serves as the backend API for Northcoders News, providing  the following endpoints: 
-
-#  Overview Of Endpoints
-```
-GET /api/topics
-GET /api
-GET /api/articles/:article_id
-GET /api/articles
-GET /api/articles/:article_id/comments
-POST /api/articles/:article_id/comments
-PATCH /api/articles/:article_id
-DELETE /api/comments/:comment_id
-GET /api/users
-GET /api/articles (queries)
-GET /api/articles/:article_id (comment count)
-```
+Welcome to the Northcoders News API! This project serves as the backend API for Northcoders News, providing  the following endpoints topics, articles, and comments.
 
 ## Getting Started
 
