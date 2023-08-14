@@ -1,24 +1,6 @@
-## News From The Northcoders API
-For instructions, please head over to [L2C NC News](https://l2c.northcoders.com/courses/be/nc-news).
-# nc-news-1
+# News From The Northcoders API
 
-
-Welcome to the Northcoders News API! This project serves as the backend API for Northcoders News, providing  the following endpoints: 
-
-## Overview Of Endpoints
-
-GET /api/topics
-GET /api
-GET /api/articles/:article_id
-GET /api/articles
-GET /api/articles/:article_id/comments
-POST /api/articles/:article_id/comments
-PATCH /api/articles/:article_id
-DELETE /api/comments/:comment_id
-GET /api/users
-GET /api/articles (queries)
-GET /api/articles/:article_id (comment count)
-
+Welcome to the Northcoders News API! This project serves as the backend API for Northcoders News, providing  the following endpoints topics, articles, and comments.
 
 ## Getting Started
 
@@ -63,7 +45,3 @@ To run this project locally, follow these steps:
      ```bash
      npm run seed
      ```
-
-
-   
-
