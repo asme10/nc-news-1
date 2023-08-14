@@ -1,3 +1,4 @@
+
 # News From The Northcoders API
 
 Welcome to the Northcoders News API! This project serves as the backend API for Northcoders News, providing  the following endpoints: 
@@ -15,8 +16,8 @@ DELETE /api/comments/:comment_id
 GET /api/users
 GET /api/articles (queries)
 GET /api/articles/:article_id (comment count)
-
 ```
+
 ## Getting Started
 
 To run this project locally, follow these steps:
@@ -60,6 +61,3 @@ To run this project locally, follow these steps:
      ```bash
      npm run seed
      ```
-
-
-   
