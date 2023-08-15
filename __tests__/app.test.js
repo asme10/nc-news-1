@@ -9,9 +9,21 @@ const {
   topicData,
   userData,
 } = require("../db/data/development-data/index.js");
+const endpoints = require("../endpoints.json");
 
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
+
+describe("/api", () => {
+  it("should provide documentation for all available endpoints", () => {
+    return request(app)
+      .get("/api")
+      .then((response) => {
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual(endpoints);
+      });
+  });
+});
 
 describe("/api/topics", () => {
   test("GET:200 status code of 200", () => {
