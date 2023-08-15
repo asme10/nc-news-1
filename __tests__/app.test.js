@@ -29,6 +29,9 @@ describe("/api/topics", () => {
         topics.forEach((topic) => {
           expect(topic).toHaveProperty("slug", expect.any(String));
           expect(topic).toHaveProperty("description", expect.any(String));
+          expect(Object.keys(topic)).toEqual(
+            expect.arrayContaining(["slug", "description"])
+          );
         });
       });
   });
