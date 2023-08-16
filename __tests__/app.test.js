@@ -10,6 +10,7 @@ const {
   userData,
 } = require("../db/data/development-data/index.js");
 const endpoints = require("../endpoints.json");
+const toBeSorted = require("jest-sorted");
 
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
@@ -93,6 +94,55 @@ describe("GET /api/articles/:article_id", () => {
       .then(({ body }) => {
         const { msg } = body;
         expect(msg).toBe("Bad request");
+      });
+  });
+});
+
+// Articles with comment_count
+describe("/api/articles", () => {
+  test("GET:200 status code of 200", () => {
+    return request(app).get("/api/articles").expect(200);
+  });
+
+  test("responds with an articles array of article objects properties: author, title, article_id, topic, created_at, votes, article_img_url, comment_count", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body.articles;
+        articles.forEach((article) => {
+          expect(article).toHaveProperty("author");
+          expect(article).toHaveProperty("title");
+          expect(article).toHaveProperty("article_id");
+          expect(article).toHaveProperty("topic");
+          expect(article).toHaveProperty("created_at");
+          expect(article).toHaveProperty("votes");
+          expect(article).toHaveProperty("article_img_url");
+          expect(article).toHaveProperty("comment_count");
+          expect(article).not.toHaveProperty("body");
+        });
+      });
+  });
+
+  test("respond with an articles array sorted by created_at in descending order", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body.articles;
+        expect(articles).toBeSorted({ key: "created_at", descending: true });
+      });
+  });
+
+  test("respond with an articles array without the body property", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body.articles;
+        articles.forEach((article) => {
+          expect(article).not.toHaveProperty("body");
+        });
       });
   });
 });
