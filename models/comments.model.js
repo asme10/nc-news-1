@@ -12,6 +12,12 @@ exports.getCommentsByArticleId = (article_id) => {
       [article_id]
     )
     .then(({ rows }) => {
+      if (!rows.length) {
+        return Promise.reject({
+          status: 404,
+          msg: "Requested article does not exist",
+        });
+      }
       return rows;
     });
 };
@@ -27,6 +33,12 @@ exports.addCommentToArticle = (commentObj, article_id) => {
       [username, body, article_id]
     )
     .then(({ rows }) => {
+      if (!rows.length) {
+        return Promise.reject({
+          status: 404,
+          msg: "Requested Id does not exist",
+        });
+      }
       return rows[0];
     });
 };

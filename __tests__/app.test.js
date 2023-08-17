@@ -184,7 +184,7 @@ describe("/api/articles/:article_id/comments", () => {
       .get("/api/articles/99999/comments")
       .expect(404)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Not found");
+        expect(msg).toBe("Requested article does not exist");
       });
   });
 
@@ -198,7 +198,7 @@ describe("/api/articles/:article_id/comments", () => {
   });
 });
 
-// POST  comments into aritcle
+// POST  comments into article
 describe("POST /api/articles/:article_id/comments", () => {
   test("POST - responds with a status 201 and the posted comment", () => {
     return request(app)
@@ -219,6 +219,77 @@ describe("POST /api/articles/:article_id/comments", () => {
           "body"
         );
         expect(comment.author).toEqual("icellusedkars");
+      });
+  });
+
+  test("POST - ignores unnecessary properties and responds with the posted comment", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .expect(201)
+      .send({
+        username: "icellusedkars",
+        body: "This is a new comment.",
+        unnecessaryProperty: "This should be ignored",
+      })
+      .then(({ body }) => {
+        const { comment } = body;
+        expect(comment).toHaveProperty("comment_id");
+        expect(comment).toHaveProperty("author", "icellusedkars");
+      });
+  });
+
+  test("POST - responds with 400 for invalid article_id", () => {
+    return request(app)
+      .post("/api/articles/not-an-id/comments")
+      .expect(400)
+      .send({
+        username: "icellusedkars",
+        body: "This is a new comment.",
+      })
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Bad request");
+      });
+  });
+
+  test("POST - responds with 404 for non-existent article_id", () => {
+    return request(app)
+      .post("/api/articles/9999/comments")
+      .expect(404)
+      .send({
+        username: "icellusedkars",
+        body: "This is a new comment.",
+      })
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Not found");
+      });
+  });
+
+  test("POST - responds with 400 for missing required fields", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .expect(400)
+      .send({
+        username: "icellusedkars",
+      })
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Bad request: Missing required field(s)");
+      });
+  });
+
+  test("POST - responds with 404 for username that does not exist", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .expect(404)
+      .send({
+        username: "nonexistentuser",
+        body: "This is a new comment.",
+      })
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Not found");
       });
   });
 });
