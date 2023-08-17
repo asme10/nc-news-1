@@ -8,7 +8,7 @@ exports.getCommentsForArticle = (req, res, next) => {
       if (comments.length === 0) {
         return res.status(404).send({ msg: "Not found" });
       }
-      res.json({ comments });
+      res.send({ comments });
     })
     .catch((err) => {
       next(err);
