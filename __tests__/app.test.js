@@ -197,3 +197,28 @@ describe("/api/articles/:article_id/comments", () => {
       });
   });
 });
+
+// POST  comments into aritcle
+describe("POST /api/articles/:article_id/comments", () => {
+  test("POST - responds with a status 201 and the posted comment", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .expect(201)
+      .send({
+        username: "icellusedkars",
+        body: "Hello there, this is my first comment",
+      })
+      .then(({ body }) => {
+        const { comment } = body;
+        expect(comment).toHaveProperty(
+          "comment_id",
+          "author",
+          "article_id",
+          "votes",
+          "created_at",
+          "body"
+        );
+        expect(comment.author).toEqual("icellusedkars");
+      });
+  });
+});
