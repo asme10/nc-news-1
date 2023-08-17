@@ -17,7 +17,7 @@ afterAll(() => db.end());
 
 // Api
 describe("/api", () => {
-  it("should provide documentation for all available endpoints", () => {
+  test("should provide documentation for all available endpoints", () => {
     return request(app)
       .get("/api")
       .then((response) => {
@@ -143,6 +143,57 @@ describe("/api/articles", () => {
         articles.forEach((article) => {
           expect(article).not.toHaveProperty("body");
         });
+      });
+  });
+});
+
+// Get all comments for an article /api/articles/:article_id/comments
+describe("/api/articles/:article_id/comments", () => {
+  test("responds with status 200 and an array of comments for a valid article_id", () => {
+    return request(app).get("/api/articles/5/comments").expect(200);
+  });
+
+  test("responds with an array of comment objects, each with required properties", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then((response) => {
+        const comments = response.body.comments;
+        expect(comments).toHaveLength(11);
+        comments.forEach((comment) => {
+          expect(comment).toHaveProperty("comment_id", expect.any(Number));
+          expect(comment).toHaveProperty("votes", expect.any(Number));
+          expect(comment).toHaveProperty("created_at", expect.any(String));
+          expect(comment).toHaveProperty("author", expect.any(String));
+          expect(comment).toHaveProperty("body", expect.any(String));
+        });
+      });
+  });
+ test("respond with an articles array without comments", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then(({ body }) => {
+        const { article } = body;
+        expect(article).not.toHaveProperty("comments");
+      });
+  });
+
+  test("responds with status 404 when the requested article does not exist", () => {
+    return request(app)
+      .get("/api/articles/99999/comments")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Not found");
+      });
+  });
+
+  test("responds with status 400 bad request when article_id is not a valid ID", () => {
+    return request(app)
+      .get("/api/articles/notAnId/comments")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad request");
       });
   });
 });
