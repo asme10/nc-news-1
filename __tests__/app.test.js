@@ -197,3 +197,136 @@ describe("/api/articles/:article_id/comments", () => {
       });
   });
 });
+
+// POST  comments into article
+describe("POST /api/articles/:article_id/comments", () => {
+  test("POST - responds with a status 201 and the posted comment", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .expect(201)
+      .send({
+        username: "icellusedkars",
+        body: "Hello there, this is my first comment",
+      })
+      .then(({ body }) => {
+        const { comment } = body;
+        expect(comment).toHaveProperty(
+          "comment_id",
+          "author",
+          "article_id",
+          "votes",
+          "created_at",
+          "body"
+        );
+        expect(comment.author).toEqual("icellusedkars");
+      });
+  });
+
+  test("POST - ignores unnecessary properties and responds with the posted comment", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .expect(201)
+      .send({
+        username: "icellusedkars",
+        body: "This is a new comment.",
+        unnecessaryProperty: "This should be ignored",
+      })
+      .then(({ body }) => {
+        const { comment } = body;
+        expect(comment).toHaveProperty("comment_id");
+        expect(comment).toHaveProperty("author", "icellusedkars");
+      });
+  });
+
+  test("POST - responds with 400 for invalid article_id", () => {
+    return request(app)
+      .post("/api/articles/not-an-id/comments")
+      .expect(400)
+      .send({
+        username: "icellusedkars",
+        body: "This is a new comment.",
+      })
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Bad request");
+      });
+  });
+
+  test("POST - responds with 404 for non-existent article_id", () => {
+    return request(app)
+      .post("/api/articles/9999/comments")
+      .expect(404)
+      .send({
+        username: "icellusedkars",
+        body: "This is a new comment.",
+      })
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Not found");
+      });
+  });
+
+  test("POST - responds with 400 for missing required fields", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .expect(400)
+      .send({
+        username: "icellusedkars",
+      })
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Bad request: Missing required field(s)");
+      });
+  });
+
+  test("POST - responds with 404 for username that does not exist", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .expect(404)
+      .send({
+        username: "nonexistentuser",
+        body: "This is a new comment.",
+      })
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Not found");
+      });
+  });
+});
+
+// PATCH article by article_id
+describe("PATCH /api/articles/:article_id", () => {
+  test("PATCH - responds with the updated article", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: 10 })
+      .expect(200)
+      .then(({ body }) => {
+        const { article } = body;
+        expect(article).toHaveProperty("article_id", 1);
+        expect(article).toHaveProperty("votes", 110);
+      });
+  });
+
+  test("PATCH - responds with 404 for non-existent article_id", () => {
+    return request(app)
+      .patch("/api/articles/9999")
+      .send({ inc_votes: 10 })
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Article with article_id 9999 not found");
+      });
+  });
+
+  test("PATCH - responds with 400 for invalid inc_votes", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: "invalid" })
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Bad request: inc_votes should be a number");
+      });
+  });
+});
