@@ -1,37 +1,37 @@
+const db = require("../db/connection");
 
-const {
-  fetchUserByUsername,
-  addNewUser,
-  fetchAllUsers,
-} = require("../models/users.model");
-
-exports.getUserByUsername = (req, res, next) => {
-  const { username } = req.params;
-  fetchUserByUsername(username)
-    .then((user) => {
-      res.status(200).send(user);
-    })
-    .catch((err) => {
-      next(err);
+exports.fetchUserByUsername = (username) => {
+  return db
+    .query("SELECT * FROM users WHERE username = $1;", [username])
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: `No user found for ${username}`,
+        });
+      } else {
+        return { user: rows[0] };
+      }
     });
 };
 
-exports.postUser = (req, res, next) => {
-  addNewUser(req.body)
-    .then((postedUser) => {
-      res.status(201).send(postedUser);
-    })
-    .catch((err) => {
-      next(err);
+exports.addNewUser = ({ username, avatar_url, name }) => {
+  return db
+    .query(
+      "INSERT INTO users (username, avatar_url, name) VALUES ($1, $2, $3) RETURNING *;",
+      [
+        username,
+        avatar_url || "http://avatarurlhere.com/avatar.jpg",
+        name || "Name Of The User",
+      ]
+    )
+    .then(({ rows }) => {
+      return { user: rows[0] };
     });
 };
 
-exports.getAllUsers = (req, res, next) => {
-  fetchAllUsers()
-    .then((fetchedUsers) => {
-      res.status(200).send(fetchedUsers);
-    })
-    .catch((err) => {
-      next(err);
-    });
+exports.fetchAllUsers = () => {
+  return db.query("SELECT * FROM users;").then(({ rows }) => {
+    return { users: rows };
+  });
 };
