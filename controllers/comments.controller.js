@@ -12,6 +12,7 @@ exports.getCommentsForArticle = (req, res, next) => {
         return res.status(404).send({ msg: "Not found" });
       }
       res.send({ comments });
+
     })
     .catch((err) => {
       next(err);
@@ -25,6 +26,8 @@ exports.postCommentByArticleId = (req, res, next) => {
   addCommentToArticle(commentObj, article_id)
     .then((comment) => {
       res.status(201).send({ comment });
+
+
     })
     .catch((err) => {
       next(err);

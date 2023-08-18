@@ -166,16 +166,16 @@ describe("/api/articles/:article_id/comments", () => {
           expect(comment).toHaveProperty("created_at", expect.any(String));
           expect(comment).toHaveProperty("author", expect.any(String));
           expect(comment).toHaveProperty("body", expect.any(String));
-          expect(Object.keys(comment)).toEqual(
-            expect.arrayContaining([
-              "comment_id",
-              "votes",
-              "created_at",
-              "author",
-              "body",
-            ])
-          );
         });
+      });
+  });
+ test("respond with an articles array without comments", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then(({ body }) => {
+        const { article } = body;
+        expect(article).not.toHaveProperty("comments");
       });
   });
 

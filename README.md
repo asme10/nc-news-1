@@ -1,47 +1,76 @@
 # News From The Northcoders API
 
-Welcome to the Northcoders News API! This project serves as the backend API for Northcoders News, providing  the following endpoints topics, articles, and comments.
+Welcome to the Northcoders News API! This project serves as the backend API for Northcoders News, providing the following endpoints topics, articles, and comments.
 
-## Getting Started
+### Getting Started & Installation
 
-To run this project locally, follow these steps:
+## Requirements
 
-1. **Clone the Repository:**
-   - Clone this repository to your local machine:
-     ```bash
-     git clone https://l2c.northcoders.com/courses/be/nc-news
-     ```
-   - Navigate to the project directory:
-     ```bash
-     cd nc-news-api
-     ```
+To run this API on your machine, you will need Node.js and Postgres installed on your machine.
 
-2. **Create .env Files:**
-   - In the root directory, create two `.env` files: `.env.test` and `.env.development`.
-   - Open `.env.test` and add the following line, replacing `your_test_database_name` with your test database name:
-     ```
-     PGDATABASE=your_test_database_name
-     ```
-   - Open `.env.development` and add the following line, replacing `your_development_database_name` with your development database name:
-     ```
-     PGDATABASE=your_development_database_name
-     ```
-   - Make sure to configure your databases according to your PostgreSQL setup.
+To install Postgres, go to: https://www.postgresql.org/download/
+The version required is a minimum of v. 12.1
 
-3. **Install Dependencies:**
-   - Run the following command to install project dependencies:
-     ```bash
-     npm install
-     ```
+To install Node, go to: https://nodejs.org/en/download/
+The version required is a minimum of v. 13.8.0
 
-4. **Set Up Databases:**
-   - Use the provided SQL script to set up your databases. In your terminal, run:
-     ```bash
-     npm run setup-dbs
-     ```
+## Installation
 
-5. **Seed Databases:**
-   - Seed the databases with sample data by running:
-     ```bash
-     npm run seed
-     ```
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+
+1.Clone a copy of the repository on your machine using the below command:
+
+```
+git clone https://github.com/asme10/nc-news-api
+```
+
+2. Install the required dependencies:
+   
+   ```
+   npm install
+   ```
+
+### Setting Up The Database
+
+1.Setup the database by running the below script:
+
+```
+  npm run setup-dbs
+```
+
+2.Setup the database by running the below script:
+
+```
+  npm run seed
+```
+
+### Environment Variables
+
+1.To store configuration settings that control how an application behaves.
+
+```
+ .env.development
+ .env.test
+```
+
+### Running the Tests
+
+1.To run the tests written for the API during the TDD process (including tests for error handling), run the following command:
+
+```
+  npm run test
+```
+
+2.To run the tests written for the utils functions, run the following command:
+
+```
+  npm run test-utils
+```
+
+## Built With
+
+This project was built using the following technologies:
+
+- [Node.js](https://nodejs.org/) - JavaScript server-side runtime environment
+- [Express](https://expressjs.com/) - Node.js web application server framework
+- [PostgreSQL](https://www.postgresql.org/) - Open source object-relational database system
