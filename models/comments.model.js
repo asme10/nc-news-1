@@ -30,3 +30,22 @@ exports.addCommentToArticle = (commentObj, article_id) => {
       return rows[0];
     });
 };
+
+// DELETE comments by comment_id            Task 9
+exports.deleteCommentById = (comment_id) => {
+  return db
+    .query(
+      `
+    DELETE FROM comments
+    WHERE comment_id = $1
+    RETURNING *;
+  `,
+      [comment_id]
+    )
+    .then((comment) => {
+      if (comment.rows.length === 0) {
+        return null;
+      }
+      return comment.rows[0];
+    });
+};
