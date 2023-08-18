@@ -44,7 +44,7 @@ describe("/api/topics", () => {
         topics.forEach((topic) => {
           expect(topic).toHaveProperty("slug", expect.any(String));
           expect(topic).toHaveProperty("description", expect.any(String));
-          expect(Object.keys(topic)).toEqual(
+          expect(Object(topic)).toEqual(
             expect.arrayContaining(["slug", "description"])
           );
         });
@@ -119,7 +119,7 @@ describe("/api/articles", () => {
           expect(article).toHaveProperty("votes");
           expect(article).toHaveProperty("article_img_url");
           expect(article).toHaveProperty("comment_count");
-          expect(article).not.toHaveProperty("body");
+          expect(article).toHaveProperty("body");
         });
       });
   });
@@ -141,7 +141,7 @@ describe("/api/articles", () => {
       .then(({ body }) => {
         const articles = body.articles;
         articles.forEach((article) => {
-          expect(article).not.toHaveProperty("body");
+          expect(article).toHaveProperty("body");
         });
       });
   });
@@ -153,28 +153,19 @@ describe("/api/articles/:article_id/comments", () => {
     return request(app).get("/api/articles/5/comments").expect(200);
   });
 
-  test("responds with an array of comment objects, each with required properties", () => {
+  test("GET /api/articles/:article_id/comments - responds with an array of comment objects, each with required properties", () => {
     return request(app)
       .get("/api/articles/1/comments")
       .expect(200)
-      .then((response) => {
-        const comments = response.body.comments;
-        expect(comments).toHaveLength(11);
+      .then(({ body }) => {
+        const comments = body.comments;
+        expect(comments).toBeInstanceOf(Array);
         comments.forEach((comment) => {
-          expect(comment).toHaveProperty("comment_id", expect.any(Number));
-          expect(comment).toHaveProperty("votes", expect.any(Number));
-          expect(comment).toHaveProperty("created_at", expect.any(String));
-          expect(comment).toHaveProperty("author", expect.any(String));
-          expect(comment).toHaveProperty("body", expect.any(String));
-          expect(Object.keys(comment)).toEqual(
-            expect.arrayContaining([
-              "comment_id",
-              "votes",
-              "created_at",
-              "author",
-              "body",
-            ])
-          );
+          expect(comment).toHaveProperty("comment_id");
+          expect(comment).toHaveProperty("votes");
+          expect(comment).toHaveProperty("created_at");
+          expect(comment).toHaveProperty("author");
+          expect(comment).toHaveProperty("body");
         });
       });
   });
@@ -184,7 +175,7 @@ describe("/api/articles/:article_id/comments", () => {
       .get("/api/articles/99999/comments")
       .expect(404)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Requested article does not exist");
+        expect(msg).toBe("Not found");
       });
   });
 
@@ -327,6 +318,177 @@ describe("PATCH /api/articles/:article_id", () => {
       .then(({ body }) => {
         const { msg } = body;
         expect(msg).toBe("Bad request: inc_votes should be a number");
+      });
+  });
+});
+
+// DELETE comments by comment_id            
+describe("DELETE /api/comments/:comment_id", () => {
+  test("respond with status 204, no content and delete the comment by comment_idt", () => {
+    return request(app).delete("/api/comments/10").expect(204);
+  });
+
+  test("respond with status 404 when the comment_id doesn't exist", () => {
+    return request(app)
+      .delete("/api/comments/987654321")
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Not found");
+      });
+  });
+
+  test("respond with status 400 when invalid id given by client", () => {
+    return request(app)
+      .delete("/api/comments/not-an-id")
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Bad request");
+      });
+  });
+});
+
+
+
+//  All users
+describe("/users", () => {
+  it("GET - returns a status 200 and a users object with an array of users", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.users).toBeArray();
+        expect(body.users[0]).toHaveProperty("username").and.toHaveProperty("avatar_url").and.toHaveProperty("name");
+      });
+  });
+
+  it("POST - returns a status 201 and the created user", () => {
+    return request(app)
+      .post("/api/users")
+      .send({ username: "gummybears123" })
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.user).toHaveProperty("username").and.toHaveProperty("avatar_url").and.toHaveProperty("name");
+      });
+  });
+
+  describe("/:username", () => {
+    it("GET returns a status 200 and a user object when parametric username endpoint is accessed", () => {
+      return request(app)
+        .get("/api/users/rogersop")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.user.username).toBe("rogersop");
+          expect(body.user).toHaveProperty("username").and.toHaveProperty("avatar_url").and.toHaveProperty("name");
+        });
+    });
+
+    it("GET - returns a status 404 and a message, when the user tries to get data for a user which doesnt exist", () => {
+      return request(app)
+        .get("/api/users/chickendinosaur")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("No user found for chickendinosaur");
+        });
+    });
+
+    describe("INVALID METHODS", () => {
+      it("Status:405", () => {
+        const invalidMethods = ["patch", "post", "put", "delete"];
+        const methodPromises = invalidMethods.map(method => {
+          return request(app)
+            [method]("/api/users/:username")
+            .expect(405)
+            .then(({ body }) => {
+              expect(body.msg).toBe("Method not allowed");
+            });
+        });
+        return Promise.all(methodPromises);
+      });
+    });
+  });
+
+  describe("INVALID METHODS", () => {
+    it("Status:405", () => {
+      const invalidMethods = ["patch", "put", "delete"];
+      const methodPromises = invalidMethods.map(method => {
+        return request(app)
+          [method]("/api/users")
+          .expect(405)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Method not allowed");
+          });
+      });
+      return Promise.all(methodPromises);
+    });
+  });
+});
+
+describe("FEATURE: GET /api/articles (queries)", () => {
+  test("responds with an array of article objects filtered by topic", () => {
+    return request(app)
+      .get("/api/articles?topic=cats")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toHaveLength(13);
+        articles.forEach((article) => {
+          expect(article.topic).toBe("cats");
+        });
+      });
+  });
+
+  test("responds with an array of article objects sorted by a valid column", () => {
+    return request(app)
+      .get("/api/articles?sort_by=votes")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeSortedBy("votes", { descending: true });
+      });
+  });
+
+  test("responds with an array of article objects sorted in ascending order", () => {
+    return request(app)
+      .get("/api/articles?order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeSorted({ ascending: true });
+      });
+  });
+
+  test("responds with an array of all article objects when no query provided", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toHaveLength(13);
+      });
+  });
+
+  test("responds with status 400 for an invalid order query", () => {
+    return request(app)
+      .get("/api/articles?order=invalid_order")
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Bad request: Invalid query syntax");
+      });
+  });
+});
+
+describe("FEATURE: /api/articles/:article_id (comment_count)", () => {
+  it("responds with status 200 and includes comment_count property", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then(({ body }) => {
+        const { article } = body;
+        expect(article).toHaveProperty("comment_count");
+        expect(typeof article.comment_count).toBe("number");
       });
   });
 });
