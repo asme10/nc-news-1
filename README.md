@@ -4,7 +4,7 @@ Welcome to the Northcoders News API! This project serves as the backend API for 
 
 ### Getting Started & Installation
 
-## Prerequisites
+## Requirements
 
 To run this API on your machine, you will need Node.js and Postgres installed on your machine.
 
@@ -22,14 +22,12 @@ These instructions will get you a copy of the project up and running on your loc
 
 ```
 git clone https://github.com/asme10/nc-news-api
-
 ```
 
 2. Install the required dependencies:
-
+3. 
    ```
    npm install
-
    ```
 
 ### Setting Up The Database
@@ -38,14 +36,12 @@ git clone https://github.com/asme10/nc-news-api
 
 ```
   npm run setup-dbs
-
 ```
 
 2.Setup the database by running the below script:
 
 ```
   npm run seed
-
 ```
 
 ### Environment Variables
@@ -55,7 +51,6 @@ git clone https://github.com/asme10/nc-news-api
 ```
  .env.development
  .env.test
-
 ```
 
 ### Running the Tests
@@ -64,14 +59,12 @@ git clone https://github.com/asme10/nc-news-api
 
 ```
   npm run test
-
 ```
 
 2.To run the tests written for the utils functions, run the following command:
 
 ```
   npm run test-utils
-
 ```
 
 ## Built With
