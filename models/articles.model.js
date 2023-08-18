@@ -53,3 +53,60 @@ exports.updateArticleVotes = (article_id, inc_votes) => {
       return rows[0];
     });
 };
+
+exports.getAllArticles = (sort_by, order) => {
+  return db
+    .query(
+      `
+    SELECT articles.*, count(comments.comment_id) AS comment_count
+    FROM articles
+    LEFT JOIN comments ON articles.article_id = comments.article_id
+    GROUP BY articles.article_id
+    ORDER BY ${sort_by} ${order};
+    `
+    )
+    .then(({ rows }) => {
+      return rows;
+    });
+};
+
+exports.getArticlesByTopic = (topic, sort_by, order) => {
+  return db
+    .query(
+      `
+    SELECT articles.*, count(comments.comment_id) AS comment_count
+    FROM articles
+    LEFT JOIN comments ON articles.article_id = comments.article_id
+    WHERE topic = $1
+    GROUP BY articles.article_id
+    ORDER BY ${sort_by} ${order};
+    `,
+      [topic]
+    )
+    .then(({ rows }) => {
+      return rows;
+    });
+};
+
+exports.fetchArticleById = (article_id) => {
+  return connection
+    .select("*")
+    .from("articles")
+    .where("article_id", article_id)
+    .then((articles) => {
+      if (articles.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: `Article with ID ${article_id} not found`,
+        });
+      }
+      return articles[0];
+    });
+};
+
+exports.fetchArticleComments = (article_id) => {
+  return connection
+    .select("*")
+    .from("comments")
+    .where("article_id", article_id);
+};
