@@ -50,7 +50,6 @@ exports.patchArticleVotes = (req, res, next) => {
     });
 };
 
-// Task 11
 exports.getArticles = (req, res, next) => {
   const { topic, sort_by = "created_at", order = "desc" } = req.query;
 
@@ -72,8 +71,6 @@ exports.getArticles = (req, res, next) => {
       });
   }
 };
-
-// Task 12
 
 exports.getArticleById = (req, res, next) => {
   const { article_id } = req.params;

@@ -30,8 +30,6 @@ exports.addCommentToArticle = (commentObj, article_id) => {
       return rows[0];
     });
 };
-
-// DELETE comments by comment_id          
 exports.deleteCommentById = (comment_id) => {
   return db
     .query(

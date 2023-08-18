@@ -44,9 +44,6 @@ describe("/api/topics", () => {
         topics.forEach((topic) => {
           expect(topic).toHaveProperty("slug", expect.any(String));
           expect(topic).toHaveProperty("description", expect.any(String));
-          expect(Object(topic)).toEqual(
-            expect.arrayContaining(["slug", "description"])
-          );
         });
       });
   });
@@ -322,7 +319,7 @@ describe("PATCH /api/articles/:article_id", () => {
   });
 });
 
-// DELETE comments by comment_id            
+// DELETE comments by comment_id          
 describe("DELETE /api/comments/:comment_id", () => {
   test("respond with status 204, no content and delete the comment by comment_idt", () => {
     return request(app).delete("/api/comments/10").expect(204);
@@ -349,8 +346,6 @@ describe("DELETE /api/comments/:comment_id", () => {
   });
 });
 
-
-
 //  All users
 describe("/users", () => {
   it("GET - returns a status 200 and a users object with an array of users", () => {
@@ -359,7 +354,10 @@ describe("/users", () => {
       .expect(200)
       .then(({ body }) => {
         expect(body.users).toBeArray();
-        expect(body.users[0]).toHaveProperty("username").and.toHaveProperty("avatar_url").and.toHaveProperty("name");
+        expect(body.users[0])
+          .toHaveProperty("username")
+          .and.toHaveProperty("avatar_url")
+          .and.toHaveProperty("name");
       });
   });
 
@@ -369,7 +367,13 @@ describe("/users", () => {
       .send({ username: "gummybears123" })
       .expect(201)
       .then(({ body }) => {
+
         expect(body.user).toHaveProperty("username").and.toHaveProperty("avatar_url").and.toHaveProperty("name");
+
+        expect(body.user)
+          .toHaveProperty("username")
+          .and.toHaveProperty("avatar_url")
+          .and.toHaveProperty("name");
       });
   });
 
@@ -381,6 +385,10 @@ describe("/users", () => {
         .then(({ body }) => {
           expect(body.user.username).toBe("rogersop");
           expect(body.user).toHaveProperty("username").and.toHaveProperty("avatar_url").and.toHaveProperty("name");
+          expect(body.user)
+            .toHaveProperty("username")
+            .and.toHaveProperty("avatar_url")
+            .and.toHaveProperty("name");
         });
     });
 
@@ -396,7 +404,6 @@ describe("/users", () => {
     describe("INVALID METHODS", () => {
       it("Status:405", () => {
         const invalidMethods = ["patch", "post", "put", "delete"];
-        const methodPromises = invalidMethods.map(method => {
           return request(app)
             [method]("/api/users/:username")
             .expect(405)
@@ -412,7 +419,6 @@ describe("/users", () => {
   describe("INVALID METHODS", () => {
     it("Status:405", () => {
       const invalidMethods = ["patch", "put", "delete"];
-      const methodPromises = invalidMethods.map(method => {
         return request(app)
           [method]("/api/users")
           .expect(405)
@@ -479,7 +485,6 @@ describe("FEATURE: GET /api/articles (queries)", () => {
       });
   });
 });
-
 describe("FEATURE: /api/articles/:article_id (comment_count)", () => {
   it("responds with status 200 and includes comment_count property", () => {
     return request(app)
