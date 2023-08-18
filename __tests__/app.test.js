@@ -293,3 +293,40 @@ describe("POST /api/articles/:article_id/comments", () => {
       });
   });
 });
+
+// PATCH article by article_id
+describe("PATCH /api/articles/:article_id", () => {
+  test("PATCH - responds with the updated article", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: 10 })
+      .expect(200)
+      .then(({ body }) => {
+        const { article } = body;
+        expect(article).toHaveProperty("article_id", 1);
+        expect(article).toHaveProperty("votes", 110);
+      });
+  });
+
+  test("PATCH - responds with 404 for non-existent article_id", () => {
+    return request(app)
+      .patch("/api/articles/9999")
+      .send({ inc_votes: 10 })
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Article with article_id 9999 not found");
+      });
+  });
+
+  test("PATCH - responds with 400 for invalid inc_votes", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: "invalid" })
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Bad request: inc_votes should be a number");
+      });
+  });
+});
