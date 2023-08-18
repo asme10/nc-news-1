@@ -13,6 +13,10 @@ exports.handlePsqlErrors = (err, req, res, next) => {
     res.status(404).send({ msg: "Not found" });
   } else if (err.code === "23502") {
     res.status(400).send({ msg: "Bad request: Missing required field(s)" });
+  } else if (err.code === "42601") {
+    res.status(400).send({ msg: "Bad request: Invalid query syntax" });
+  } else if (err.code === "2703") {
+    res.status(400).send({ msg: "Bad request: Schema name does not exist" });
   } else {
     next(err);
   }
