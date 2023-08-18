@@ -25,7 +25,7 @@ git clone https://github.com/asme10/nc-news-api
 ```
 
 2. Install the required dependencies:
-3. 
+   
    ```
    npm install
    ```
