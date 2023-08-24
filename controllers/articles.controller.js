@@ -12,7 +12,11 @@ exports.getArticleById = (req, res, next) => {
   const { article_id } = req.params;
 
   selectArticleById(article_id)
-    .then((article) => res.status(200).send({ article }))
+    .then((article) =>
+      res.status(200).send({
+        article,
+      })
+    )
     .catch((err) => {
       next(err);
     });
@@ -50,10 +54,46 @@ exports.patchArticleVotes = (req, res, next) => {
     });
 };
 
+exports.updateArticleVotes = (article_id, votes) => {
+  return db("articles")
+    .where({ article_id })
+    .increment("votes", votes)
+    .returning("*")
+    .then((articles) => {
+      if (articles.length === 0) {
+        return Promise.reject({ status: 404, msg: "Article not found" });
+      }
+      return articles[0];
+    });
+};
+
+exports.fetchArticleWithComments = (req, res, next) => {
+  const articleId = req.params.article_id;
+
+  fetchArticleById(articleId)
+    .then((article) => {
+      if (!article) {
+        return Promise.reject({
+          status: 404,
+          msg: `Article with ID ${articleId} not found`,
+        });
+      }
+
+      return fetchArticleComments(articleId).then((comments) => {
+        article.comment_count = comments.length;
+        res.status(200).send({ article });
+      });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
 exports.getArticles = (req, res, next) => {
   const { topic, sort_by = "created_at", order = "desc" } = req.query;
 
   if (topic) {
+    // Use getArticlesByTopic function to fetch articles filtered by topic
     getArticlesByTopic(topic, sort_by, order)
       .then((articles) => {
         res.send({ articles });
@@ -62,6 +102,7 @@ exports.getArticles = (req, res, next) => {
         next(err);
       });
   } else {
+    // Use getAllArticles function to fetch all articles
     getAllArticles(sort_by, order)
       .then((articles) => {
         res.send({ articles });
@@ -72,15 +113,14 @@ exports.getArticles = (req, res, next) => {
   }
 };
 
-exports.getArticleById = (req, res, next) => {
-  const { article_id } = req.params;
+exports.getArticlesByTopic = (req, res, next) => {
+  const { topic, sort_by = "created_at", order = "desc" } = req.query;
 
-  fetchArticleById(article_id)
-    .then((article) => {
-      return fetchArticleComments(article_id).then((comments) => {
-        article.comment_count = comments.length;
-        res.status(200).send({ article });
-      });
+  getArticlesByTopic(topic, sort_by, order)
+    .then((articles) => {
+      res.send({ articles });
     })
-    .catch(next);
+    .catch((err) => {
+      next(err);
+    });
 };

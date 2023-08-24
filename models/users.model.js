@@ -1,37 +1,47 @@
 const db = require("../db/connection");
 
-exports.fetchUserByUsername = (username) => {
+exports.selectUsers = () => {
+  return db.query(`SELECT username FROM users;`).then((result) => {
+    if (result.rows.length === 0) {
+      return Promise.reject({ status: 404, msg: "Not found" });
+    }
+    return result.rows;
+  });
+};
+
+exports.selectUserByUsername = (username) => {
+  if (Number(username)) {
+    return Promise.reject({ status: 400, msg: "Bad request" });
+  }
   return db
-    .query("SELECT * FROM users WHERE username = $1;", [username])
-    .then(({ rows }) => {
-      if (rows.length === 0) {
-        return Promise.reject({
-          status: 404,
-          msg: `No user found for ${username}`,
-        });
+    .query(
+      `
+    SELECT * FROM users
+    WHERE username = $1;
+    `,
+      [username]
+    )
+    .then((result) => {
+      if (result.rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "Path not found" });
       } else {
-        return { user: rows[0] };
+        return result.rows[0];
       }
     });
 };
 
-exports.addNewUser = ({ username, avatar_url, name }) => {
+exports.selectArticles = (topic, sort_by = "created_at", order = "desc") => {
   return db
     .query(
-      "INSERT INTO users (username, avatar_url, name) VALUES ($1, $2, $3) RETURNING *;",
-      [
-        username,
-        avatar_url || "http://avatarurlhere.com/avatar.jpg",
-        name || "Name Of The User",
-      ]
+      `
+    SELECT *
+    FROM articles
+    ${topic ? "WHERE topic = $1" : ""}
+    ORDER BY ${sort_by} ${order};
+    `,
+      [topic]
     )
-    .then(({ rows }) => {
-      return { user: rows[0] };
+    .then((result) => {
+      return result.rows;
     });
-};
-
-exports.fetchAllUsers = () => {
-  return db.query("SELECT * FROM users;").then(({ rows }) => {
-    return { users: rows };
-  });
 };
