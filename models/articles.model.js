@@ -1,5 +1,5 @@
 const db = require("../db/connection");
-
+const fetchArticleComments = require("../models/comments.model");
 exports.selectArticleById = (article_id) => {
   return db
     .query("SELECT * FROM articles WHERE article_id = $1;", [article_id])
@@ -11,16 +11,15 @@ exports.selectArticleById = (article_id) => {
     });
 };
 
-// All Articles with comment_count
 exports.getArticles = () => {
   return db
     .query(
       `
-    SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count
-    FROM articles
-    LEFT JOIN comments ON articles.article_id = comments.article_id
-    GROUP BY articles.article_id
-    ORDER BY created_at DESC;
+      SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count
+      FROM articles
+      LEFT JOIN comments ON articles.article_id = comments.article_id
+      GROUP BY articles.article_id
+      ORDER BY created_at DESC;
     `
     )
     .then(({ rows }) => {
@@ -74,12 +73,12 @@ exports.getArticlesByTopic = (topic, sort_by, order) => {
   return db
     .query(
       `
-    SELECT articles.*, count(comments.comment_id) AS comment_count
-    FROM articles
-    LEFT JOIN comments ON articles.article_id = comments.article_id
-    WHERE topic = $1
-    GROUP BY articles.article_id
-    ORDER BY ${sort_by} ${order};
+      SELECT articles.*, COUNT(comments.comment_id) AS comment_count
+      FROM articles
+      LEFT JOIN comments ON articles.article_id = comments.article_id
+      WHERE topic = $1
+      GROUP BY articles.article_id
+      ORDER BY ${sort_by} ${order};
     `,
       [topic]
     )
@@ -89,7 +88,7 @@ exports.getArticlesByTopic = (topic, sort_by, order) => {
 };
 
 exports.fetchArticleById = (article_id) => {
-  return connection
+  return db
     .select("*")
     .from("articles")
     .where("article_id", article_id)
@@ -100,13 +99,33 @@ exports.fetchArticleById = (article_id) => {
           msg: `Article with ID ${article_id} not found`,
         });
       }
-      return articles[0];
+
+      const article = articles[0];
+
+      return fetchArticleComments(article_id).then((comments) => {
+        article.comment_count = comments.length;
+        return article;
+      });
     });
 };
 
-exports.fetchArticleComments = (article_id) => {
-  return connection
-    .select("*")
-    .from("comments")
-    .where("article_id", article_id);
+exports.selectArticleById = (article_id) => {
+  return db
+    .query(
+      `
+    SELECT articles.*, COUNT(comments.comment_id) AS comment_count
+    FROM articles
+    LEFT JOIN comments ON articles.article_id = comments.article_id
+    WHERE articles.article_id = $1
+    GROUP BY articles.article_id;
+    `,
+      [article_id]
+    )
+    .then((result) => {
+      const article = result.rows[0];
+      if (!article) {
+        return Promise.reject({ status: 404, msg: "Article not found" });
+      }
+      return article;
+    });
 };

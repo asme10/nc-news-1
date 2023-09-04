@@ -1,34 +1,36 @@
+const users = require("../db/data/test-data/users");
 const {
-  fetchUserByUsername,
-  addNewUser,
-  fetchAllUsers,
+  selectUsers,
+  selectUserByUsername,
+  selectArticles,
 } = require("../models/users.model");
+exports.getUsers = (req, res, next) => {
+  selectUsers()
+    .then((users) => {
+      res.status(200).send({ users });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
 
 exports.getUserByUsername = (req, res, next) => {
   const { username } = req.params;
-  fetchUserByUsername(username)
+
+  selectUserByUsername(username)
     .then((user) => {
-      res.status(200).send(user);
+      res.status(200).send({ user: user });
     })
     .catch((err) => {
       next(err);
     });
 };
+exports.getArticles = (req, res, next) => {
+  const { topic, sort_by, order } = req.query;
 
-exports.postUser = (req, res, next) => {
-  addNewUser(req.body)
-    .then((postedUser) => {
-      res.status(201).send(postedUser);
-    })
-    .catch((err) => {
-      next(err);
-    });
-};
-
-exports.getAllUsers = (req, res, next) => {
-  fetchAllUsers()
-    .then((fetchedUsers) => {
-      res.status(200).send(fetchedUsers);
+  selectArticles(topic, sort_by, order)
+    .then((articles) => {
+      res.status(200).send({ articles });
     })
     .catch((err) => {
       next(err);
