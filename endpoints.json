@@ -1,27 +1,123 @@
 {
-  "GET /api": {
-    "description": "serves up a json representation of all the available endpoints of the api"
-  },
-  "GET /api/topics": {
-    "description": "serves an array of all topics",
-    "queries": [],
-    "exampleResponse": {
-      "topics": [{ "slug": "football", "description": "Footie!" }]
-    }
-  },
-  "GET /api/articles": {
-    "description": "serves an array of all articles",
-    "queries": ["author", "topic", "sort_by", "order"],
-    "exampleResponse": {
-      "articles": [
-        {
+  "endpoints": {
+    "GET /api": {
+      "description": "serves up a json representation of all the available endpoints of the api",
+      "queries": [],
+      "exampleResponse": {
+        "endPoints": {
+          "get/endpoint": {
+            "description": "description",
+            "queries": "array of queries",
+            "exampleResponse": "example response"
+          }
+        }
+      }
+    },
+    "GET /api/topics": {
+      "description": "serves an array of all topics",
+      "queries": [],
+      "exampleResponse": {
+        "topics": [
+          {
+            "slug": "football",
+            "description": "Footie!"
+          }
+        ]
+      }
+    },
+    "GET /api/articles": {
+      "description": "serves an array of all articles",
+      "queries": ["author", "topic", "sort_by", "order"],
+      "exampleResponse": {
+        "articles": [
+          {
+            "title": "Seafood substitutions are increasing",
+            "topic": "cooking",
+            "author": "weegembump",
+            "body": "Text from the article..",
+            "created_at": "2018-05-30T15:59:13.341Z",
+            "votes": 0,
+            "comment_count": 6
+          }
+        ]
+      }
+    },
+    "GET /api/articles/:article_id": {
+      "description": "serves up a single article by article_id",
+      "queries": [],
+      "exampleResponse": {
+        "article": {
           "title": "Seafood substitutions are increasing",
           "topic": "cooking",
           "author": "weegembump",
           "body": "Text from the article..",
           "created_at": "2018-05-30T15:59:13.341Z",
-          "votes": 0,
-          "comment_count": 6
+          "votes": 0
+        }
+      }
+    },
+    "GET /api/articles/:article_id/comments": {
+      "description": "serves an array of comments for the given article_id",
+      "queries": [],
+      "exampleResponse": [
+        {
+          "comment_id": "number",
+          "votes": "number",
+          "created_at": "string",
+          "author": "string",
+          "body": "string",
+          "article_id": "number"
+        },
+        {
+          "comment_id": "number",
+          "votes": "number",
+          "created_at": "string",
+          "author": "string",
+          "body": "string",
+          "article_id": "number"
+        }
+      ]
+    },
+    "POST /api/articles/:article_id/comment": {
+      "description": "adds a comment for specified article and serves an object of the posted comment",
+      "queries": [],
+      "exampleResponse": {
+        "username": "string",
+        "body": "string"
+      }
+    },
+    "PATCH /api/articles/article_id": {
+      "description": "updates votes on article and serves an object of the updated article",
+      "queries": [],
+      "exampleResponse": {
+        "article": {
+          "title": "Seafood substitutions are increasing",
+          "topic": "cooking",
+          "author": "weegembump",
+          "body": "Text from the article..",
+          "created_at": "2018-05-30T15:59:13.341Z",
+          "votes": 0
+        }
+      }
+    },
+    "DELETE /api/comment/:comment_id": {
+      "description": "deletes comment with specfied comment_id",
+      "queries": [],
+      "exampleResponse": "no response"
+    },
+    "GET /api/users": {
+      "description": "serves an array of all users",
+      "queries": [],
+      "exampleResponse": [
+        {
+          "username": "string",
+          "name": "string",
+          "avatar_url": "string"
+        },
+        {
+          "username": "string",
+          "name": "string",
+          "avatar_url": "string"
         }
       ]
     }
